@@ -1,9 +1,13 @@
-Zeus Scraper + CAPTCHA Solver 🎓🇨🇱
+Zeus Scraper + CAPTCHA Solver :mortar_board::flag_cl:
+
 Proyecto académico de automatización, web scraping y machine learning aplicado a la resolución de CAPTCHAs numéricos del portal Zeus del Servicio de Impuestos Internos (SII) de Chile.
 
 Esta herramienta permite consultar información pública de RUTs en el portal Zeus, resolviendo automáticamente los CAPTCHAs mediante un modelo de IA entrenado con ejemplos reales.
 
-🚀 Funcionalidades principales
+
+
+:rocket: Funcionalidades principales
+
 Scraper automatizado que interactúa con la plataforma Zeus.
 
 Modelo de Machine Learning capaz de resolver CAPTCHAs numéricos distorsionados.
@@ -14,7 +18,8 @@ Módulo de integración directa para programadores que desean incorporar esta fu
 
 Sistema de recolección de imágenes para seguir entrenando y mejorando el modelo.
 
-🛠️ Tecnologías utilizadas
+:hammer_and_wrench: Tecnologías utilizadas
+
 Python 3
 
 Selenium
@@ -29,15 +34,12 @@ Tkinter (para interfaz gráfica)
 
 Pillow (PIL)
 
-🖼️ ¿Cómo son los CAPTCHAs del portal Zeus?
-El portal utiliza CAPTCHAs de 4 dígitos numéricos, con diferentes niveles de distorsión, fondos de colores variables y líneas de ruido que dificultan su lectura automatizada.
+:framed_picture: ¿Cómo son los CAPTCHAs del portal Zeus?
 
-Aun así, los patrones son reconocibles, y un modelo bien entrenado puede superar estas dificultades con alta precisión.
+El portal utiliza CAPTCHAs que consisten en 4 dígitos numéricos, presentados con diferentes colores de fondo, distorsión de las cifras y líneas de ruido que atraviesan los números. Aunque son visualmente alterados, mantienen patrones consistentes que permiten su resolución mediante un modelo entrenado adecuadamente.
 
-⚡ Instalación y uso rápido
-bash
-Copiar
-Editar
+:zap: Instalación y uso rápido
+
 # Clona este repositorio
 git clone https://github.com/TU_USUARIO/zeus-scraper-captcha-solver.git
 
@@ -46,10 +48,9 @@ cd zeus-scraper-captcha-solver
 
 # Instala las dependencias
 pip install -r requirements.txt
-🔥 Para usar el objeto programático:
-python
-Copiar
-Editar
+
+:fire: Para usar el objeto programático:
+
 from zeus_scraper import Zeus
 
 # Lista de RUTs
@@ -60,61 +61,61 @@ zeus = Zeus(ruts=ruts)
 
 # Acceder a la información
 print(zeus["12345678-9"].name)
-🖥️ Para usar el front-end:
-bash
-Copiar
-Editar
+
+:desktop_computer: Para usar el front-end:
+
 python frontend.py
+
 Esto abrirá una ventana donde puedes cargar tu archivo de RUTs y descargar los resultados.
 
-⚠️ Importante
+:package: Descarga del modelo
+
+Debido al tamaño del modelo de IA, no está directamente en el repositorio. Puedes descargarlo aquí:
+
+➡ Descargar modelo entrenado desde Dropbox
+
+(Recuerda mover el archivo descargado a la carpeta captcha_solver/ antes de ejecutar.)
+
+:warning: Importante
+
 Este proyecto es exclusivamente académico.
 
 Disclaimer: Debido a la naturaleza del portal Zeus, al consultar RUTs es posible obtener nombres asociados visibles públicamente. Se recomienda realizar un proceso de limpieza de los datos antes de cualquier uso adicional.
 
-📂 Estructura del proyecto
-bash
-Copiar
-Editar
+:file_folder: Estructura del proyecto
+
 zeus-scraper-captcha-solver/
 ├── captcha_collector/       # Scripts para recolectar y guardar imágenes de CAPTCHAs
-│   ├── collect_captchas.py
-│   ├── README.md
-│
 ├── captcha_solver/          # Entrenamiento del modelo IA
-│   ├── train_model.py
-│   ├── model.h5             # Modelo entrenado (no subir pesado a GitHub; sugerir enlace de descarga)
-│   ├── README.md
-│
 ├── zeus_scraper/            # Scraper principal y clase Zeus
-│   ├── zeus_scraper.py
-│   ├── __init__.py
-│   ├── README.md
-│
 ├── frontend/                # Interfaz gráfica
-│   ├── frontend.py
-│   ├── README.md
-│
 ├── requirements.txt         # Librerías necesarias
-├── README.md                 # Este documento
-├── LICENSE                   # (Opcional) Licencia del proyecto
-└── .gitignore                # Para ignorar carpetas de modelos o datasets pesados
-📹 Video demostrativo
-[Coloca aquí el link al video en YouTube o Loom 🔗]
+├── README.md                # Este documento
+├── LICENSE                  # Licencia MIT
+└── .gitignore               # Ignorar archivos innecesarios
 
-📈 Estado del proyecto
-✅ Recolección de datos
-✅ Entrenamiento del modelo
-✅ Scraper funcional
-✅ Front-End funcional
-🔜 Mejoras en la precisión del modelo para futuros cambios de CAPTCHA
+:clapper: Video demostrativo
 
-🤝 Contribuciones
+[Próximamente: Link al video]
+
+:handshake: Contribuciones
+
 ¡Toda ayuda es bienvenida!
 Si quieres mejorar el proyecto o adaptarlo, siéntete libre de abrir un issue o enviar un pull request.
 
-🔗 Contacto
+:link: Contacto
+
 [Tu perfil de LinkedIn] | [Tu correo o portfolio]
 
-Tags
+Etiquetas
+
 #Python #MachineLearning #WebScraping #Selenium #InteligenciaArtificial #DataEngineering #Automatización #OpenSource #ProyectoAcadémico
+
+:memo: Licencia
+
+Este proyecto está licenciado bajo los términos de la Licencia MIT.
+
+Se permite su uso, copia, modificación y distribución libremente, siempre bajo las condiciones indicadas.
+Este software se proporciona "tal cual", sin garantía de ningún tipo.
+El uso de esta herramienta es responsabilidad exclusiva del usuario.
+
