@@ -1,13 +1,18 @@
 import os
 from datetime import datetime
-
 from mltu.configs import BaseModelConfigs
+from app.utils.funciones import Path, os
+from configs import FEATURES_DIR
 
+#MACHINE LEARNING
+ml_path = fr'{Path(FEATURES_DIR) }\pyme_finder\configs\ml\202407231124'
+model_path = os.path.join(ml_path, 'model.h5')
+configs_path = os.path.join(ml_path, 'configs.yaml')
 
 class ModelConfigs(BaseModelConfigs):
     def __init__(self):
         super().__init__()
-        self.model_path = os.path.join("models/02_captcha_to_text", datetime.strftime(datetime.now(), "%Y%m%d%H%M"))
+        self.model_path = os.path.join("models", datetime.strftime(datetime.now(), "%Y%m%d%H%M"))
         self.vocab = ""
         self.height = 50
         self.width = 200

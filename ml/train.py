@@ -29,13 +29,13 @@ def download_and_unzip(url, extract_to="datasets"):
     zipfile.extractall(path=extract_to)
 
 
-if not os.path.exists(os.path.join("datasets", "captcha_images_v2")):
-    download_and_unzip("https://github.com/AakashKumarNain/CaptchaCracker/raw/master/captcha_images_v2.zip",
+if not os.path.exists(os.path.join("datasets", "captcha_images_v1")):
+    download_and_unzip("https://github.com/AakashKumarNain/CaptchaCracker/raw/master/captcha_images_v1.zip",#!Cambiar esto por la que corresponda
                        extract_to="datasets")
 
 # Create a list of all the images and labels in the dataset
 dataset, vocab, max_len = [], set(), 0
-captcha_path = os.path.join("datasets", "captcha_images_v2")
+captcha_path = os.path.join("datasets", "captcha_images_v1")
 for file in os.listdir(captcha_path):
     file_path = os.path.join(captcha_path, file)
     label = os.path.splitext(file)[0] # Get the file name without the extension
