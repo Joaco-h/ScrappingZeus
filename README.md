@@ -1,4 +1,4 @@
-# Zeus Scraper + CAPTCHA Solver :mortar_board: :flag_cl:
+# Zeus Scraper + CAPTCHA Solver :mortar_board:
 
 Proyecto académico de automatización, web scraping y machine learning aplicado a la resolución de CAPTCHAs numéricos del portal Zeus del Servicio de Impuestos Internos (SII) de Chile.
 
