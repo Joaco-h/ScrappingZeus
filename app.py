@@ -1,21 +1,31 @@
+import sys
+from pathlib import Path
+
+# Importar la configuración del entorno primero
+from app.configs.environment import PROJECT_ROOT
+# Ahora podemos importar el resto de módulos con seguridad
 from PySide6.QtCore import QUrl, QObject, Slot
 from PySide6.QtWidgets import QApplication, QFileDialog
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWebEngineCore import QWebEngineProfile
-from pathlib import Path
-import sys
+from PySide6.QtWebChannel import QWebChannel
 import json
 
+# Importar las funciones correctas de tus archivos
+from app.core.captcha_extractor import get_captchas_labels
+from app.core.zeus_scrapping import create_pyme_file
+from app.configs.configs import call_driver, site_url, ml_path, configs_path
+
 class Backend(QObject):
-    def __init__(self, web_view):
+    def __init__(self):
         super().__init__()
-        self.web_view = web_view
+        self.temp_path = {}
+        self.cell_addresses = {}
 
     @Slot(int)
     def extractCaptchas(self, count):
         try:
-            # Llamar a tu función existente de extracción de captchas
-            from app.core.captcha_extractor import get_captchas_labels
+            # Usar la función existente de captcha_extractor
             get_captchas_labels(count)
             self.notify_frontend("Extracción de captchas completada")
         except Exception as e:
@@ -24,49 +34,60 @@ class Backend(QObject):
     @Slot()
     def openFileDialog(self):
         file_name, _ = QFileDialog.getOpenFileName(
-            self.web_view,
+            None,
             "Seleccionar archivo Excel",
             "",
             "Excel Files (*.xlsx *.xls)"
         )
         if file_name:
             try:
-                # Procesar el archivo y obtener los RUTs
-                ruts = self.process_excel_file(file_name)
-                # Enviar los RUTs al frontend
-                self.web_view.page().runJavaScript(
-                    f"window.displayRuts({json.dumps(ruts)})"
-                )
+                # Guardar la ruta del archivo para usarla en el scraping
+                self.temp_path = {
+                    'fileInputPyme': file_name,
+                    'tempFile': file_name  # Puedes ajustar esto según necesites
+                }
+                
+                # Configurar cell_addresses con valores por defecto o desde un formulario
+                self.cell_addresses = {
+                    'rutPyme': 'A2',  # Estos valores deberían venir del frontend
+                    'namePyme': 'B2',
+                    'lastRowPyme': '10',
+                    'sheetname': 'Sheet1'
+                }
+                
+                # Aquí podrías leer el archivo para mostrar los RUTs
+                # Por ahora solo mostraremos un mensaje
+                self.notify_frontend("Archivo cargado correctamente")
             except Exception as e:
                 self.notify_frontend(f"Error al cargar el archivo: {str(e)}")
 
     @Slot()
     def startScraping(self):
         try:
-            # Llamar a tu función existente de scraping
-            from app.core.zeus_scrapping import create_pyme_file
+            if not self.temp_path:
+                self.notify_frontend("Por favor, carga un archivo primero")
+                return
+
+            # Usar la función existente de zeus_scrapping
             result = create_pyme_file(self.temp_path, self.cell_addresses)
             self.notify_frontend(result)
         except Exception as e:
             self.notify_frontend(f"Error: {str(e)}")
 
     def notify_frontend(self, message):
-        js = f"alert('{message}')"  # Puedes mejorar esto con una UI más elegante
-        self.web_view.page().runJavaScript(js)
+        js = f"alert('{message}')"
+        if hasattr(self, 'page'):
+            self.page.runJavaScript(js)
 
-    def process_excel_file(self, file_path):
-        # Implementar la lógica para leer los RUTs del archivo Excel
-        # Retornar la lista de RUTs
-        pass
+    def set_web_page(self, page):
+        self.page = page
 
 class WebApp(QWebEngineView):
     def __init__(self):
         super().__init__()
-        self.backend = Backend(self)
         self.setup_ui()
         
     def setup_ui(self):
-        # Configurar la ventana principal
         self.setWindowTitle("Zeus Tools")
         self.resize(1200, 800)
         
@@ -74,12 +95,15 @@ class WebApp(QWebEngineView):
         profile = QWebEngineProfile.defaultProfile()
         profile.setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
         
-        # Exponer el backend al JavaScript
-        self.page().setWebChannel(self.backend)
+        # Configurar el canal web y el backend
+        self.channel = QWebChannel(self)
+        self.backend = Backend()
+        self.backend.set_web_page(self.page())
+        self.channel.registerObject("backend", self.backend)
+        self.page().setWebChannel(self.channel)
         
-        # Cargar el archivo HTML
-        current_dir = Path(__file__).parent
-        html_path = current_dir / "templates" / "index.html"
+        # Usar PROJECT_ROOT para las rutas
+        html_path = PROJECT_ROOT / "templates" / "index.html"
         self.load(QUrl.fromLocalFile(str(html_path.absolute())))
 
 def main():
