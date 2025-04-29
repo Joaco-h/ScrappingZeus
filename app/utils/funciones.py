@@ -110,15 +110,23 @@ def validate_integer(func):
             return rut
     return wrapper
 
-def fetch_captcha_image(driver):
-    """Download and return the captcha image from the web page."""
-    captcha_image_element = driver.find_element(By.ID, 'imgcapt')
-    captcha_image_url = captcha_image_element.get_attribute('src')
-
-    response = requests.get(captcha_image_url)
-    captcha_image = Image.open(io.BytesIO(response.content))
-
-    return captcha_image
+def fetch_captcha_image(driver, array=True):
+    """
+    Obtiene la imagen del captcha de una página web y la guarda como 'captcha.png'.
+    
+    Parámetros:
+        driver (objeto webdriver): El controlador del navegador web.
+    """
+    
+    captcha_element = driver.find_element(By.ID, 'imgcapt')
+    
+    png = captcha_element.screenshot_as_png
+    im = Image.open(BytesIO(png))
+    if array==False: 
+        return im
+    numpy_image = np.array(im)
+    image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
+    return image
 
 def fill_form_fields(driver, textboxes, rut, dv, captcha):
     """Send RUT, DV, and captcha values to the form inputs."""
@@ -145,22 +153,6 @@ def get_textboxes(driver):
             'dv':text_boxes[1],
             'captcha':text_boxes[2]}
 
-
-def get_captcha_image(driver):
-    """
-    Obtiene la imagen del captcha de una página web y la guarda como 'captcha.png'.
-    
-    Parámetros:
-        driver (objeto webdriver): El controlador del navegador web.
-    """
-    
-    captcha_element = driver.find_element(By.ID, 'imgcapt')
-    
-    png = captcha_element.screenshot_as_png
-    im = Image.open(BytesIO(png))
-    numpy_image = np.array(im)
-    image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
-    return image
 
 def send_keys(textboxes, rut, dv, captcha):
     """
