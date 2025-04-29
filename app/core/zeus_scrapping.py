@@ -1,155 +1,216 @@
-from app.configs.configs import TEST_DIR
-from app.utils.funciones import np, pd, time, Path, typing, calcular_dv, extract_text, extract_number, get_cell_value, extract_rut_before_dash, handler_excel_errors
-from app.utils.funciones import (cv2, By, EC, WebDriverWait, BaseModelConfigs, OnnxInferenceModel, ctc_decoder, get_textboxes, get_captcha_image, send_keys, handle_alert, extraer_informacion)
-from app.configs.configs import call_driver, site_url, ml_path, configs_path
+from pathlib import Path
+import time
+import cv2
+from typing import Dict, List, Tuple, Union
+import numpy as np
+import pandas as pd
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webdriver import WebDriver
 
-class SalirBucle(Exception):
-    pass
+from app.configs.configs import (
+    call_driver, site_url, ml_path, configs_path,
+    TEST_DIR
+)
+from app.utils.funciones import (
+    calcular_dv, extract_text, extract_number,
+    get_cell_value, extract_rut_before_dash,
+    get_textboxes, get_captcha_image, send_keys,
+    handle_alert, extraer_informacion
+)
+from mltu.configs import BaseModelConfigs
+from mltu.inferenceModel import OnnxInferenceModel
+from mltu.utils.text_utils import ctc_decoder
 
-class ImageToWordModel(OnnxInferenceModel):
-    def __init__(self, char_list: typing.Union[str, list], *args, **kwargs):
+class CaptchaModel(OnnxInferenceModel):
+    """Modelo para predicción de CAPTCHAs."""
+    
+    def __init__(self, char_list: Union[str, list], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.char_list = char_list
     
-    
-    def predict(self, image: np.ndarray):
+    def predict(self, image: np.ndarray) -> str:
+        """Predice el texto del CAPTCHA desde una imagen."""
         image = cv2.resize(image, self.input_shapes[0][1:3][::-1])
         image_pred = np.expand_dims(image, axis=0).astype(np.float32)
         preds = self.model.run(self.output_names, {self.input_names[0]: image_pred})[0]
-        text = ctc_decoder(preds, self.char_list)[0]
-        return text
+        return ctc_decoder(preds, self.char_list)[0]
 
-def format_pyme_temp_file(temp_path, cellAddresses):
-    name_file, path_file = list(temp_path.items())[0]
-    rut_column = extract_text(cellAddresses['rutPyme'])
-    name_column = extract_text(cellAddresses['namePyme']) if cellAddresses['namePyme'] else rut_column
-    first_row = extract_number(cellAddresses['rutPyme'])
-    lastrow = extract_number(cellAddresses['lastRowPyme'])
-    sheet_name = cellAddresses['sheetname']
+class PymeDataFormatter:
+    """Clase para el formateo de datos PYME desde archivos Excel."""
     
-    df = pd.read_excel(
-        path_file,
-        sheet_name=sheet_name, 
-        usecols=f'{rut_column}:{name_column}',
-        skiprows=first_row-1,
-        nrows=lastrow
+    def __init__(self, temp_path: Dict[str, Path], cell_addresses: Dict[str, str]):
+        self.temp_path = temp_path
+        self.cell_addresses = cell_addresses
+        self.name_file, self.path_file = list(temp_path.items())[0]
+    
+    def _extract_excel_parameters(self) -> Tuple[str, str, int, int, str]:
+        """Extrae los parámetros necesarios del Excel."""
+        rut_column = extract_text(self.cell_addresses['rutPyme'])
+        name_column = (extract_text(self.cell_addresses['namePyme']) 
+                    if self.cell_addresses['namePyme'] else rut_column)
+        first_row = extract_number(self.cell_addresses['rutPyme'])
+        last_row = extract_number(self.cell_addresses['lastRowPyme'])
+        sheet_name = self.cell_addresses['sheetname']
+        return rut_column, name_column, first_row, last_row, sheet_name
+    
+    def format_data(self) -> Tuple[pd.DataFrame, str, str]:
+        """Formatea los datos del archivo Excel."""
+        rut_col, name_col, first_row, last_row, sheet_name = self._extract_excel_parameters()
+        
+        df = pd.read_excel(
+            self.path_file,
+            sheet_name=sheet_name,
+            usecols=f'{rut_col}:{name_col}',
+            skiprows=first_row-1,
+            nrows=last_row
         )
-    
-    rut_value = get_cell_value(path_file, sheet_name, cellAddresses['rutPyme'])
-    name_value = get_cell_value(path_file, sheet_name, cellAddresses['namePyme']) if cellAddresses['namePyme'] else False
-    
-    return df, rut_value, name_value
+        
+        rut_value = get_cell_value(self.path_file, sheet_name, self.cell_addresses['rutPyme'])
+        name_value = (get_cell_value(self.path_file, sheet_name, self.cell_addresses['namePyme'])
+                    if self.cell_addresses['namePyme'] else False)
+        
+        return df, rut_value, name_value
 
-def scrape_rut_info(temp_path, cellAddresses):
-    driver_chrome = call_driver()
-    driver_chrome.get(site_url)
+class ZeusScraper:
+    """Clase principal para el scraping de información PYME desde Zeus."""
     
-    configs = BaseModelConfigs.load(configs_path)
-    configs.model_path = ml_path
-    model = ImageToWordModel(model_path=configs.model_path, char_list=configs.vocab)
+    def __init__(self, temp_path: Dict[str, Path], cell_addresses: Dict[str, str]):
+        self.temp_path = temp_path
+        self.cell_addresses = cell_addresses
+        self.driver = None
+        self.model = self._initialize_model()
+        self.ruts_pyme: List[Dict] = []
     
-    df, rut_col, name_col = format_pyme_temp_file(temp_path, cellAddresses)
-    print('----------------------------------------------------------------')
-    print(rut_col, name_col)
-    print('----------------------------------------------------------------')
-    print(df)
-    print('----------------------------------------------------------------')
-    ruts = df[rut_col].drop_duplicates().reset_index(drop=True)
+    def _initialize_model(self) -> CaptchaModel:
+        """Inicializa el modelo de predicción de CAPTCHAs."""
+        configs = BaseModelConfigs.load(configs_path)
+        configs.model_path = ml_path
+        return CaptchaModel(model_path=configs.model_path, char_list=configs.vocab)
     
-    #TESTS WITH BAD RUTS          
-    #ADD BAD RUTS AT FIRST ROW
-    # ruts = pd.concat([pd.Series('k'), ruts], ignore_index=True)
-    # ruts = pd.concat([pd.Series('19738907-9'), ruts], ignore_index=True)
-    # ruts = pd.concat([pd.Series('19738907'), ruts], ignore_index=True)
-    # ##ADD BAD RUTS AT LAST ROW
-    # ruts = pd.concat([ruts, pd.Series('k')], ignore_index=True)
-    
-    i = 0
-    ruts_pyme = []
-    
-    start_time = time.time()
-    while i < len(ruts):
-        rut = str(ruts[i]).replace('−','-').split('-')[0]
+    def _process_single_rut(self, rut: str) -> bool:
+        """Procesa un único RUT y retorna True si fue exitoso."""
+        rut = str(rut).replace('−','-').split('-')[0]
         dv = calcular_dv(rut)
         
-        #CHECK IF RUT IS ALREADY PROCESS
-        if any(d['Rut']==f'{rut}-{dv}' for d in ruts_pyme):
-            print(f'El Rut {rut} ya existe en ruts_pyme, saltando a la siguiente iteracion.')
-            i+=1
-            continue
+        # Verificar si el RUT ya fue procesado
+        if any(d['Rut']==f'{rut}-{dv}' for d in self.ruts_pyme):
+            print(f'RUT {rut} ya procesado, saltando...')
+            return True
         
-        #SEND INPUTS TO THE WEBSITE
-        textboxes = get_textboxes(driver_chrome)
-        image = get_captcha_image(driver_chrome)
-        captcha = model.predict(image)
+        # Procesar el RUT
+        textboxes = get_textboxes(self.driver)
+        image = get_captcha_image(self.driver)
+        captcha = self.model.predict(image)
         send_keys(textboxes, rut, dv, captcha)
         
-        alert = handle_alert(driver_chrome) #En caso de ingresar un rut/captcha invalido se acepta la alerta del buscador
-        
+        alert = handle_alert(self.driver)
         if alert == 'R':
-            i+=1
-            driver_chrome.refresh()
-            ruts_pyme.append({'Rut': rut,'Nombre Zeus': np.nan, 'Pyme': np.nan})
-            continue
+            self.ruts_pyme.append({'Rut': rut,'Nombre Zeus': np.nan, 'Pyme': np.nan})
+            self.driver.refresh()
+            return True
+        elif alert == 'C':
+            self.driver.refresh()
+            return False
         
-        if alert =='C':
-            driver_chrome.refresh()
-            continue
+        # Extraer información
+        elements = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_all_elements_located((By.TAG_NAME, 'div'))
+        )
+        name, pyme = extraer_informacion(elements[0].text)
+        self.ruts_pyme.append({'Rut': f'{rut}-{dv}', 'Nombre Zeus': name, 'Pyme': pyme})
         
-        #GET THE INFO
-        elements = WebDriverWait(driver_chrome, 10).until(
-                EC.presence_of_all_elements_located((By.TAG_NAME, 'div'))
+        self.driver.get(site_url)
+        return True
+    
+    def _format_results(self, df: pd.DataFrame, rut_col: str, name_col: str) -> pd.DataFrame:
+        """Formatea los resultados finales en un DataFrame."""
+        df_results = pd.DataFrame(self.ruts_pyme)
+        df_results.sort_values(by='Rut', ascending=True, inplace=True)
+        df_results.drop_duplicates(subset='Rut', inplace=True)
+        df_results['Rut sin Dv'] = df_results['Rut'].apply(extract_rut_before_dash)
+        
+        if name_col:
+            df['Rut sin Dv'] = df[rut_col].apply(extract_rut_before_dash)
+            df_results = df_results.merge(df, on='Rut sin Dv', how='left')
+            df_results.dropna(subset='Rut', inplace=True)
+            df_results.drop_duplicates(subset='Rut', inplace=True)
+            
+            df_results[f'{name_col}Nuevo'] = np.where(
+                df_results['Nombre Zeus'] != '**',
+                df_results['Nombre Zeus'],
+                df_results[name_col]
             )
-        text = elements[0].text
-        name, pyme = extraer_informacion(text)
+            df_results = df_results[['Rut', 'Rut sin Dv', f'{name_col}Nuevo', 'Pyme']]
+            df_results.rename({f'{name_col}Nuevo': name_col}, axis=1, inplace=True)
         
-        print(f'Nombre o Razón Social: {name}')
-        print(f'Es PYME: {pyme}')
-        
-        ruts_pyme.append({'Rut': rut + '-' + dv, 'Nombre Zeus':name , 'Pyme':pyme})
-        
-        # image = cv2.resize(image, (image.shape[1] * 4, image.shape[0] * 4))
-        # cv2.imshow(captcha, image)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-        driver_chrome.get(site_url)
-        
-        i+=1
+        return df_results[['Rut', 'Rut sin Dv', name_col, 'Pyme']]
     
-    end_time = time.time()
-    
-    print(f'Registros buscados: {len(ruts)}')
-    print(f'Tiempo de ejecución: {end_time - start_time} segundos')
-    
-    df_ruts_pyme = pd.DataFrame(ruts_pyme)
-    df_ruts_pyme.sort_values(by='Rut', ascending=True, inplace=True)
-    df_ruts_pyme.drop_duplicates(subset='Rut', inplace=True)
-    df_ruts_pyme['Rut sin Dv'] = df_ruts_pyme['Rut'].apply(extract_rut_before_dash)
-    
-    if name_col:
-        df['Rut sin Dv'] = df[rut_col].apply(extract_rut_before_dash)
-        df_ruts_pyme = df_ruts_pyme.merge(df, on='Rut sin Dv', how='left')
-        df_ruts_pyme.dropna(subset='Rut', inplace=True)
-        df_ruts_pyme.drop_duplicates(subset='Rut', inplace=True)
-        df_ruts_pyme[name_col+'Nuevo'] = np.where(
-            df_ruts_pyme['Nombre Zeus'] != '**',
-            df_ruts_pyme['Nombre Zeus'],
-            df_ruts_pyme[name_col])
-        df_ruts_pyme = df_ruts_pyme[['Rut', 'Rut sin Dv', name_col+'Nuevo', 'Pyme']]
-        df_ruts_pyme.rename({name_col+'Nuevo': name_col}, axis=1, inplace=True)
-    
-    df_ruts_pyme = df_ruts_pyme[['Rut', 'Rut sin Dv', name_col, 'Pyme']]
-    df_ruts_pyme.to_excel(temp_path['fileInputPyme'], sheet_name='Pyme', index=False)
+    def scrape(self) -> str:
+        """Ejecuta el proceso de scraping completo."""
+        try:
+            self.driver = call_driver()
+            self.driver.get(site_url)
+            
+            # Preparar datos
+            formatter = PymeDataFormatter(self.temp_path, self.cell_addresses)
+            df, rut_col, name_col = formatter.format_data()
+            ruts = df[rut_col].drop_duplicates().reset_index(drop=True)
+            
+            # Procesar RUTs
+            start_time = time.time()
+            total_ruts = len(ruts)
+            
+            print(f"\nIniciando procesamiento de {total_ruts} RUTs...")
+            for i, rut in enumerate(ruts, 1):
+                while not self._process_single_rut(rut):
+                    continue
+                # Mostrar progreso
+                if i % 10 == 0 or i == total_ruts:
+                    progress = (i / total_ruts) * 100
+                    print(f"Progreso: {i}/{total_ruts} ({progress:.1f}%)")
+            
+            # Formatear y guardar resultados
+            df_results = self._format_results(df, rut_col, name_col)
+            output_path = Path(self.temp_path['fileInputPyme'])
+            df_results.to_excel(output_path, sheet_name='Pyme', index=False)
+            
+            execution_time = time.time() - start_time
+            print(f'\nProceso completado:')
+            print(f'- Registros procesados: {total_ruts}')
+            print(f'- Tiempo de ejecución: {execution_time:.2f} segundos')
+            print(f'- Archivo guardado en: {output_path}')
+            
+            return 'Archivo Pyme creado exitosamente!'
+            
+        except Exception as e:
+            return f'Error: {str(e)}'
+        finally:
+            if self.driver:
+                self.driver.quit()
 
-@handler_excel_errors
-def create_pyme_file(temp_path, cellAddresses):
-    try:
-        scrape_rut_info(temp_path, cellAddresses)
-        return 'Archivo Pyme Creado Exitosamente!'
+def create_pyme_file(temp_path: Dict[str, Path], cell_addresses: Dict[str, str]) -> str:
+    """Función principal para crear el archivo PYME."""
+    scraper = ZeusScraper(temp_path, cell_addresses)
+    return scraper.scrape()
+
+if __name__ == "__main__":
+    # Ejemplo de uso
+    test_temp_path = {
+        'fileInputPyme': TEST_DIR / 'test_pyme.xlsx',
+        'tempFile': TEST_DIR / 'temp_data.xlsx'
+    }
     
-    except PermissionError as e:
-        return f'Error de Permisos: {e}'
-    except FileNotFoundError as e:
-        return f'Archivo no encontrado: {e}'
+    test_cell_addresses = {
+        'rutPyme': 'A2',
+        'namePyme': 'B2',
+        'lastRowPyme': '10',
+        'sheetname': 'Sheet1'
+    }
+    
+    try:
+        result = create_pyme_file(test_temp_path, test_cell_addresses)
+        print(result)
     except Exception as e:
-        return f'Ocurrio un error innesperado: {e}'
+        print(f"Error en la ejecución: {e}")
