@@ -110,22 +110,21 @@ def validate_integer(func):
             return rut
     return wrapper
 
-
-def enter_captcha(driver, textboxes, rut, dv, captcha):
-    textboxes['rut'].send_keys(rut)
-    textboxes['dv'].send_keys(dv)
-    textboxes['captcha'].send_keys(captcha)
-
+def fetch_captcha_image(driver):
+    """Download and return the captcha image from the web page."""
     captcha_image_element = driver.find_element(By.ID, 'imgcapt')
     captcha_image_url = captcha_image_element.get_attribute('src')
 
     response = requests.get(captcha_image_url)
     captcha_image = Image.open(io.BytesIO(response.content))
 
-    print(captcha_image)
-
     return captcha_image
 
+def fill_form_fields(driver, textboxes, rut, dv, captcha):
+    """Send RUT, DV, and captcha values to the form inputs."""
+    textboxes['rut'].send_keys(rut)
+    textboxes['dv'].send_keys(dv)
+    textboxes['captcha'].send_keys(captcha + Keys.RETURN)
 
 def get_textboxes(driver):
     """
