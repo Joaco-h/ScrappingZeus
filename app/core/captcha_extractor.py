@@ -11,7 +11,7 @@ class CaptchaCollector:
         self.dv = dv
         self.site_url = 'https://zeus.sii.cl/cvc/stc/stc.html'
         self.unique_captchas = set()
-        self.data_dir = DATA_DIR
+        self.data_dir = DATA_DIR/ 'captcha_images_v1'
         self._load_existing_captchas()
         
     def _load_existing_captchas(self):
@@ -121,6 +121,3 @@ def main(meta=2500, rut='19738907', dv='9'):
 if __name__ == "__main__":
     main()
 
-
-if __name__ == '__main__':
-    get_captchas_labels(2500)

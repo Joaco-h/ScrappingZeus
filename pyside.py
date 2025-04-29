@@ -1,4 +1,4 @@
-# from app.core.captcha_extractor import get_captchas_labels
+from app.core.captcha_extractor import main
 
-# get_captchas_labels(2500)
+main()
 
