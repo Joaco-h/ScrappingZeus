@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeus Scraper</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>Zeus Tools</span>
+            </div>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="#" class="nav-link active" data-page="captcha-extractor">
+                            <i class="fas fa-camera"></i>
+                            <span>Extractor de Captchas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link" data-page="zeus-scraper">
+                            <i class="fas fa-search"></i>
+                            <span>Consulta Zeus</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <main class="content">
+        <!-- Página del Extractor de Captchas -->
+        <div class="page active" id="captcha-extractor">
+            <h1>Extractor de Captchas</h1>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Configuración de Extracción</h2>
+                </div>
+                <div class="card-body">
+                    <form id="captcha-form">
+                        <div class="form-group">
+                            <label for="captcha-count">Número de Captchas a extraer:</label>
+                            <input type="number" id="captcha-count" name="captcha-count" min="1" value="100">
+                        </div>
+                        <button type="submit" class="btn primary">Iniciar Extracción</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página del Scraper Zeus -->
+        <div class="page" id="zeus-scraper">
+            <h1>Consulta Zeus</h1>
+            <div class="card">
+                <div class="card-header">
+                    <h2>RUTs a Consultar</h2>
+                    <button class="btn secondary" id="load-file">
+                        <i class="fas fa-file-upload"></i>
+                        Cargar Archivo
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="rut-list" id="rut-container">
+                        <!-- Los RUTs se cargarán aquí dinámicamente -->
+                    </div>
+                    <div class="actions">
+                        <button class="btn primary" id="start-scraping">
+                            <i class="fas fa-play"></i>
+                            Iniciar Consulta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 
