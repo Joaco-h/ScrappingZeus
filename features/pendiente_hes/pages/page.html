@@ -1,0 +1,117 @@
+<h1 class="page-title">Pendiente de H.E.S</h1>
+
+<section class="date__container">
+    <label for="dateinput__hes">Fecha de cierre</label>
+    <input type="month" name="trip-start" id="dateinput__hes" class="dateinput">
+</section>
+
+<section class="uploadfile__container">
+    <div for="file__actual" class="drop-container" id="dropcontainer__actual">
+        <h2 class="drop-container--title">Archivo actual</h2>
+        <span class="drop-container--title">Deja el archivo aquí</span>
+        o
+        <input required type="file" id="file__actual"
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+    </div>
+
+    <div for="file__previo" class="drop-container" id="dropcontainer__previo">
+        <h2 class="drop-container--title">Archivo previo</h2>
+        <span class="drop-container--title">Deja el archivo aquí</span>
+        o
+        <input required type="file" id="file__previo"
+            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+    </div>
+</section>
+
+<fieldset class="checklist__hes">
+    <legend>Enviar Correos a Áreas</legend>
+
+    <div class="row row-1">
+        <div>
+            <input type="checkbox" class="field__checkbox--hes" id="checkbox-sustentabilidad" name="areas"
+                value="Área Sustentabilidad" />
+            <label for="checkbox-sustentabilidad">
+                <span></span>
+                Sustentabilidad
+                <ins><i></i></ins>
+            </label>
+        </div>
+
+        <div>
+            <input type="checkbox" class="field__checkbox--hes" id="checkbox-informatica" name="areas"
+                value="Área Informática" />
+            <label for="checkbox-informatica">
+                <span></span>
+                Informática
+                <ins><i></i></ins>
+            </label>
+        </div>
+
+        <div>
+            <input type="checkbox" class="field__checkbox--hes" id="checkbox-finanzas" name="areas"
+                value="Área Adm & Finanzas" />
+            <label for="checkbox-finanzas">
+                <span></span>
+                Finanzas
+                <ins><i></i></ins>
+            </label>
+        </div>
+
+        <div>
+            <input type="checkbox" class="field__checkbox--hes" id="checkbox-operaciones" name="areas"
+                value="Área Operaciones" />
+            <label for="checkbox-operaciones">
+                <span></span>
+                Operaciones
+                <ins><i></i></ins>
+            </label><br>
+        </div>
+    </div>
+
+    <div class="row row-2">
+        <div>
+            <input type="checkbox" class="field__checkbox--hes" id="checkbox-personas" name="areas"
+                value="Área Personas" />
+            <label for="checkbox-personas">
+                <span></span>
+                Personas
+                <ins><i></i></ins>
+            </label>
+        </div>
+
+        <div>
+            <input type="checkbox" class="field__checkbox--hes" id="checkbox-sso" name="areas"
+                value="Área SSO" />
+            <label for="checkbox-sso">
+                <span></span>
+                SSO
+                <ins><i></i></ins>
+            </label>
+        </div>
+
+        <div>
+            <input type="checkbox" class="field__checkbox--hes" id="checkbox-comercial" name="areas"
+                value="Área Comercial" />
+            <label for="checkbox-comercial">
+                <span></span>
+                Comercial
+                <ins><i></i></ins>
+            </label>
+        </div>
+    </div>
+</fieldset>
+
+<section class="button-hes-container">
+    <div id="create_hes_file_container" class="button-container">
+        <button class="button_hes" id="create_hes_file">Generar Archivo Hes</button>
+        <div class="button-overlay"></div>
+    </div>
+    <div id="split_file_container" class="button-container">
+        <button class="button_hes" id="split_file">Generar Archivo por Área</button>
+        <div class="button-overlay"></div>
+    </div>
+    <div id="send_email_container" class="button-container">
+        <button class="button_hes" id="send_email">Generar Correos por Área</button>
+        <div class="button-overlay"></div>
+    </div>
+</section>

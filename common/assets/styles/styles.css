@@ -1,0 +1,200 @@
+*, ::after, ::before {
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    height: 100vh;
+    background-size: cover;
+    background-image: linear-gradient(#ffffff94, #ffffff94);
+
+    display: grid;
+    grid-template-columns: auto 1fr; /* Define dos columnas: una para el aside y otra para el section */
+    align-items: start; /* Alinea los elementos al inicio verticalmente */
+}
+
+.page-title {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #1b3550;
+    width: max-content;
+    border-radius: 10px;
+    padding: 2rem 1rem;
+    align-self: center;
+}
+
+/* Descomenta esta parte para que el aside se expanda al pasar el mouse */
+.sidebar:hover .sidebar__element {
+    grid-template-columns: 40px 1fr;
+}
+
+.sidebar__list {
+    list-style: none;
+    padding: 0;
+
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+}
+
+.sidebar__element {
+    padding: .8rem .5rem;
+    border-radius: 3px;
+
+    display: grid;
+    align-items: center;
+    grid-template-columns: 40px 0fr;
+
+    background-color: #1b3550;
+    color: #526581;
+    fill: #8491a5;
+
+    transition: grid-template-columns .4s;
+}
+
+.sidebar__element:not(:has(.sidebar__icon--logo)):hover {
+    background-color: #f7ba31;
+    color: #fff;
+    fill: #fff;
+    cursor: pointer;
+}
+
+.sidebar__element:has(.sidebar__icon--logo) {
+    margin-bottom: 1rem;
+    align-items: flex-start;
+}
+
+.sidebar__icon {
+    width: 60px;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    justify-self: center;
+}
+
+.sidebar__icon--logo {
+    max-width: 40px;
+}
+
+.sidebar__icon--letters {
+    max-height: 41.7px;
+}
+
+.sidebar__logo, .sidebar__text {
+    padding-left: 1.3rem;
+}
+
+.sidebar__element--close {
+    margin-top: auto;
+}
+
+.sidebar__hide {
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.dropdown__menu {
+    max-height: 0; /* Altura inicial 0 */
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-10px) scaleY(0.8); /* Inicia comprimido */
+    transition: max-height 0.5s ease-in-out, opacity 0.3s ease-in-out, transform 0.4s ease-in-out;
+}
+
+.dropdown__menu.show {
+    max-height: 200px; /* Ajusta según el contenido */
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+}
+
+.dropdown__icon {
+    width: 20px;
+    margin-left: 0.2rem;
+    aspect-ratio: 1/1;
+    justify-self: center;
+}
+
+.sidebar__element.dropdown__element {
+    transform: scale(0.9); /* Escala el elemento al 50% de su tamaño original */
+    /* También puedes ajustar individualmente otras propiedades como: */
+    padding: 0rem 0rem 0rem 1rem;  /* Reducir el padding */
+    font-size: 0.8rem; /* Reducir el tamaño de la fuente */
+}
+
+.sidebar__element.dropdown__element .sidebar__text {
+    position: relative; /* Necesario para el posicionamiento de ::before */
+}
+
+.sidebar__element.dropdown__element .sidebar__text::before {
+    content: "- "; /* El guion y un espacio */
+    position: absolute;
+    left: 0.4rem; /* Ajusta la posición del guion */
+    top: -0.1rem;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra horizontalmente */
+    justify-content: flex-start; /* Alinea el contenido al inicio (arriba) */
+    height: 100vh;
+    padding-top: 20px; /* Agrega un poco de espacio arriba */
+}
+
+.custom-alert {
+    display: none;
+    flex-direction: column;
+    position: fixed;  /* Eliminar luego */
+    left: 55%; /* Eliminar luego */
+    top: 2%;
+    width: 450px;
+    height: 120px;
+    color: white;
+    padding: 0;
+    border-radius: 6px 6px 0px 0px;
+    box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box; /* Asegura que el padding se incluya en el tamaño total */
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+}
+
+.custom-alert.show {
+    display: flex;
+    opacity: 1;
+}
+
+.custom-alert-header {
+    flex: 0 0 20%; /* Elimina el margen por defecto del párrafo */
+    padding: 10px 14px;
+    font-size: 14px;
+    background-color: #007BFF;
+    border-radius: 6px 6px 0px 0px;
+}
+
+.custom-alert-content {
+    display: flex;
+    align-items: flex-start;
+    flex: 0 0 80%;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: black;
+    border-radius: 0px 0px 6px 6px;
+    background-color: white;
+}
+
+.custom-alert__icon {
+    width: 50px;
+    height: 50px;
+    fill: grey;
+    margin-right: 10px;
+    margin-top: 0;
+    padding: 0;
+}

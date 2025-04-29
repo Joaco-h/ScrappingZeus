@@ -1,0 +1,104 @@
+**Explicacion Flujo Threads
+¡Claro! Vamos a desglosar este código paso a paso.
+
+### Clase `ExcelWorker`
+Esta clase hereda de `QThread`, lo que significa que se ejecutará en un hilo separado. Esto es útil para realizar tareas que pueden llevar tiempo sin bloquear la interfaz de usuario.
+
+- **Señal `finished`**: Esta señal se emite cuando el proceso ha terminado, enviando un mensaje de tipo `str`.
+- **Método `__init__`**: Inicializa la clase base `QThread`.
+- **Método `run`**: Este método se ejecuta cuando el hilo comienza. Aquí, se guarda un archivo temporal de Excel y se emite la señal `finished` con el resultado de la creación del archivo.
+
+```python
+class ExcelWorker(QThread):
+    finished = Signal(str)
+    
+    def __init__(self):
+        super().__init__()
+        
+    def run(self):
+        self.save_path_temp = get_file_path(TEMP_DIR, 'temp.xlsx') #Temp Save
+        self.finished.emit(create_excel_file(self.save_path_temp))
+```
+
+### Clase `CallHandler`
+Esta clase maneja las llamadas y señales, y contiene dos métodos decorados con `@Slot`.
+
+- **Método `send_to_server`**: Este método recibe argumentos y, si uno de ellos es `'Crea el archivo Excel'`, crea una instancia de `ExcelWorker`, conecta la señal `finished` a un método de manejo (`on_processing_finished`), y comienza el hilo. Devuelve `'Proceso iniciado'`.
+
+```python
+class CallHandler(QObject):
+    @Slot(str, result=str)
+    def send_to_server(self, *args):
+        for arg in args:
+            print(arg)
+            if arg == 'Crea el archivo Excel':
+                self.worker = ExcelWorker()
+                self.worker.finished.connect(self.on_processing_finished)
+                self.worker.start()
+                return 'Proceso iniciado'
+```
+
+- **Método `on_processing_finished`**: Este método se llama cuando la señal `finished` es emitida. Si el mensaje indica que el archivo Excel se creó exitosamente, se solicita una ruta de guardado y se renombra el archivo temporal. Si no, imprime el mensaje recibido.
+
+```python
+    @Slot(str)
+    def on_processing_finished(self, message):
+        print(message)
+        if 'Archivo Excel Creado Exitosamente!' in message:
+            save_path = save_file_folder(save_type = 'file')
+            if save_path:
+                rename_temp_file(self.worker.save_path_temp, save_path)
+            else:
+                print('Guardado cancelado')
+        else:
+            print(message)
+```
+
+### Resumen del Flujo
+1. **Inicio del Proceso**: `send_to_server` recibe una solicitud para crear un archivo Excel.
+2. **Creación del Hilo**: Se crea y se inicia un `ExcelWorker`.
+3. **Ejecución en Hilo Separado**: `ExcelWorker` guarda un archivo temporal y emite una señal cuando termina.
+4. **Manejo del Resultado**: `on_processing_finished` maneja el resultado, renombrando el archivo temporal si la creación fue exitosa.
+
+**Explicacion decorador Slot
+¡Claro! Vamos a desglosar ambos conceptos.
+
+### Recepción del Argumento `message` en `on_processing_finished`
+
+El argumento `message` se recibe en la función `on_processing_finished` a través de la señal `finished` emitida por la clase `ExcelWorker`. Aquí está el flujo:
+
+1. **Emisión de la Señal**: En el método `run` de `ExcelWorker`, se emite la señal `finished` con un mensaje como argumento:
+    ```python
+    self.finished.emit(create_excel_file(self.save_path_temp))
+    ```
+
+2. **Conexión de la Señal**: En `CallHandler`, la señal `finished` de `ExcelWorker` se conecta al método `on_processing_finished`:
+    ```python
+    self.worker.finished.connect(self.on_processing_finished)
+    ```
+
+3. **Recepción del Mensaje**: Cuando `ExcelWorker` emite la señal `finished`, el método `on_processing_finished` se llama automáticamente con el mensaje emitido como argumento:
+    ```python
+    @Slot(str)
+    def on_processing_finished(self, message):
+        print(message)
+        # Resto del código...
+    ```
+
+### Función del Decorador `@Slot`
+
+El decorador `@Slot` se utiliza en PyQt para declarar que un método es una ranura (slot) que puede ser conectada a una señal (signal). Aquí hay algunos puntos clave:
+
+- **Declaración de Tipos**: `@Slot` puede especificar los tipos de argumentos que la ranura acepta. En tu código, `@Slot(str)` indica que `on_processing_finished` acepta un argumento de tipo `str`.
+- **Conexión de Señales y Ranuras**: Facilita la conexión entre señales y ranuras, asegurando que los tipos de datos sean compatibles.
+- **Optimización**: Ayuda a PyQt a optimizar la conexión y el manejo de señales y ranuras.
+
+Ejemplo de uso en tu código:
+```python
+@Slot(str)
+def on_processing_finished(self, message):
+    print(message)
+    # Resto del código...
+```
+
+En resumen, `@Slot` declara que `on_processing_finished` es una ranura que acepta un `str`, y `message` se recibe cuando `ExcelWorker` emite la señal `finished`.

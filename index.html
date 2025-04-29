@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PENDIENTE H.E.S</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap">
+    <link rel="stylesheet" href="./common/assets/styles/styles.css" />
+    <script src="./common/assets/libs/xlsx.full.min.js"></script>
+    <!-- <script src="qrc:///qtwebchannel/qwebchannel.js" defer></script> -->
+    <script src="./common/assets/events/initializeApp.js" defer></script>
+    <script src="./common/assets/events/handleSidebarClick.js" defer></script>
+    <script src="./common/assets/events/pageSelector.js" defer></script>
+    <script src="./common/assets/events/fileUtils.js" defer></script>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <ul class="sidebar__list">
+            <li class="sidebar__element">
+                <img src="./common/assets/images/logo_pmej_blanco.png" class="sidebar__icon sidebar__icon--logo" />
+                <div class="sidebar__hide">
+                    <img src="./common/assets/images/logo_letters_pmej_white.png"
+                        class="sidebar__logo sidebar__icon--letters" />
+                </div>
+            </li>
+            <li class="sidebar__element" id="report__page">
+                <svg class="sidebar__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24">
+                    <path
+                        d="M6 21H3a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1zm7 0h-3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1zm7 0h-3a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1z">
+                    </path>
+                </svg>
+                <div class="sidebar__hide">
+                    <p class="sidebar__text">Reportes</p>
+                    <svg class="dropdown__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="m19.5 8.25-7.5 7.5-7.5-7.5"  clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </li>
+            <div class="dropdown__menu" id="dropdown__menu">
+                <li class="sidebar__element dropdown__element" id="hes__page">
+                    <svg class="dropdown__element__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"></svg>
+                    <div class="sidebar__hide dropdown__hide">
+                        <p class="sidebar__text dropdown__text">HES</p>
+                    </div>
+                </li>
+                <li class="sidebar__element dropdown__element" id="pyme__page">
+                    <svg class="dropdown__element__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"></svg>
+                    <div class="sidebar__hide dropdown__hide">
+                        <p class="sidebar__text dropdown__text">Proveedores</p>
+                    </div>
+                </li>
+            </div>
+            <li class="sidebar__element" id="contact__page">
+                <svg class="sidebar__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24">
+                    <path
+                        d="M20 2H4c-1.103 0-2 .894-2 1.992v12.016C2 17.106 2.897 18 4 18h3v4l6.351-4H20c1.103 0 2-.894 2-1.992V3.992A1.998 1.998 0 0 0 20 2z">
+                    </path>
+                </svg>
+                <div class="sidebar__hide">
+                    <p class="sidebar__text">Contacto</p>
+                </div>
+            </li>
+
+            <li class="sidebar__element sidebar__element--close" id="sidebar__button--close">
+
+                <svg class="sidebar__icon sidebar__icon--close" xmlns="http://www.w3.org/2000/svg" width="24"
+                    height="24" viewBox="0 0 24 24">
+                    <path
+                        d="M18 2H6a1 1 0 0 0-1 1v9l5-4v3h6v2h-6v3l-5-4v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z">
+                    </path>
+                </svg>
+
+                <div class="sidebar__hide">
+                    <h3 class="sidebar__text sidebar__text--close">Cerrar</h3>
+                </div>
+
+            </li>
+
+        </ul>
+    </aside>
+
+    <main class="main-content" id="content">
+        <!-- Contenido de las paginas -->
+    </main>
+</body>
+
+<div id="customAlert" class="custom-alert">
+    
+    <div class="custom-alert-header">
+        <p>Faltan Parámetros</p>
+    </div>
+    
+    <div class="custom-alert-content">
+        <!-- <span id="customAlertMessage"></span> -->
+        <svg class="custom-alert__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
+                clip-rule="evenodd" />
+        </svg>
+        <p id="customAlertMessage">Para continuar con el proceso, es necesario que subas
+            ambos archivos. Asegúrate de que los archivos estén
+            correctamente seleccionados antes de proceder</p>
+    </div>
+</div>
+
+</html>

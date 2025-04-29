@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtCore import QUrl, QFileSystemWatcher, Slot, QObject
 from PySide6.QtWebChannel import QWebChannel
 
-from app.configs.configs import TEMP_DIR, HTML_DIR, COMMON_CSS_DIR, FEATURES_DIR
+from app.configs.configs import TEMP_DIR, HTML_DIR
 from app.utils.funciones import io, sys
 from app.utils.funciones import Path, get_file_path, clean_folder, rename_temp_file, save_file_folder
 
@@ -99,15 +99,10 @@ def load_html():
 load_html()
 clean_folder(TEMP_DIR) #Limpiar la carpeta temp cada vez que se inicia la app
 
-style_hes = fr'{Path(FEATURES_DIR)}/pyme_finder/assets/styles/styles.css'
-page_hes = fr'{Path(FEATURES_DIR)}/pyme_finder/pages/page.html'
 
 #Configurar el watcher para recargar HTML y CSS
 watcher = QFileSystemWatcher()
 watcher.addPath(HTML_DIR)
-watcher.addPath(COMMON_CSS_DIR)
-watcher.addPath(style_hes)
-watcher.addPath(page_hes)
 watcher.fileChanged.connect(load_html)
 
 view.resize(1024, 750)
