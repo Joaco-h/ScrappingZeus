@@ -32,7 +32,7 @@
 
 .contact-content {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* Cambiado a flex-start para alinear a la izquierda */
 }
 
 .contact-info {
@@ -44,7 +44,7 @@
 .contact-info h2 {
     color: var(--primary-color);
     margin-bottom: 30px;
-    text-align: center;
+    text-align: left; /* Cambiado a left */
 }
 
 .info-item {
