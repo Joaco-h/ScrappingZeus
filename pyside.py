@@ -27,7 +27,7 @@ class CallHandler(QObject):
     #Botones del Sidebar
     @Slot()
     def close_application(self):
-        clean_folder(TEMP_DIR) #Limpiar la carpeta temp cada vez que se inicia la app
+        clean_folder(TEMP_DIR, '*') #Limpiar la carpeta temp cada vez que se inicia la app
         print("Cerrando aplicacion...")
         QApplication.instance().quit()
     
@@ -42,39 +42,39 @@ class CallHandler(QObject):
         self.uploaded_files[idfile] = file_stream
         print(self.uploaded_files)
         
-    @Slot(str, list, result=str)
-    def send_order_to_server(self, command, values):
-        print(f"send_order_to_server llamado con commando: {command}")
-        if command == "Conseguir mas CAPTCHAs para entrenamiento":
-            self.excel_worker = ExcelWorker(self.uploaded_files)
-            self.excel_worker.finished.connect(self.on_processing_finished)
-            self.excel_worker.start()
-            return "Creacion de archivo iniciado"
-        if command == "Divide el archivo":
-            self.split_worker = SplitWorker(self.file_save_path, self.area_folder)
-            self.split_worker.start()
-            return "Division de archivo iniciado"
-        return "Comando no reconocido"
+    # @Slot(str, list, result=str)
+    # def send_order_to_server(self, command, values):
+    #     print(f"send_order_to_server llamado con commando: {command}")
+    #     if command == "Conseguir mas CAPTCHAs para entrenamiento":
+    #         self.excel_worker = ExcelWorker(self.uploaded_files)
+    #         self.excel_worker.finished.connect(self.on_processing_finished)
+    #         self.excel_worker.start()
+    #         return "Creacion de archivo iniciado"
+    #     if command == "Divide el archivo":
+    #         self.split_worker = SplitWorker(self.file_save_path, self.area_folder)
+    #         self.split_worker.start()
+    #         return "Division de archivo iniciado"
+    #     return "Comando no reconocido"
     
-    @Slot(str)
-    def on_processing_finished(self, message):
-        print(message)
-        if 'Archivo Excel Creado Exitosamente!' in message:
-            self.file_save_path = save_file_folder(save_type = 'file')
-            area_folder = Path(self.file_save_path).resolve().parent
-            self.area_folder = get_file_path(area_folder, "Archivos Áreas")
-            if self.file_save_path:
-                rename_temp_file(self.excel_worker.temp_paths['file__actual'], self.file_save_path)
-            else:
-                print('Guardado cancelado')
-        if 'Archivo Pyme Creado Exitosamente!' in message:
-            self.file_save_path = save_file_folder(save_type = 'file')
-            if self.file_save_path:
-                rename_temp_file(self.search_pyme.temp_paths['fileInputPyme'], self.file_save_path)
-            else:
-                print('Guardado cancelado')
-        else:
-            print(message)
+    # @Slot(str)
+    # def on_processing_finished(self, message):
+    #     print(message)
+    #     if 'Archivo Excel Creado Exitosamente!' in message:
+    #         self.file_save_path = save_file_folder(save_type = 'file')
+    #         area_folder = Path(self.file_save_path).resolve().parent
+    #         self.area_folder = get_file_path(area_folder, "Archivos Áreas")
+    #         if self.file_save_path:
+    #             rename_temp_file(self.excel_worker.temp_paths['file__actual'], self.file_save_path)
+    #         else:
+    #             print('Guardado cancelado')
+    #     if 'Archivo Pyme Creado Exitosamente!' in message:
+    #         self.file_save_path = save_file_folder(save_type = 'file')
+    #         if self.file_save_path:
+    #             rename_temp_file(self.search_pyme.temp_paths['fileInputPyme'], self.file_save_path)
+    #         else:
+    #             print('Guardado cancelado')
+    #     else:
+    #         print(message)
 
 
 #Configuracion de la aplicacion
@@ -97,12 +97,14 @@ def load_html():
     view.reload()
 
 load_html()
-clean_folder(TEMP_DIR) #Limpiar la carpeta temp cada vez que se inicia la app
+clean_folder(TEMP_DIR, '*') #Limpiar la carpeta temp cada vez que se inicia la app
 
 
 #Configurar el watcher para recargar HTML y CSS
 watcher = QFileSystemWatcher()
-watcher.addPath(HTML_DIR)
+watcher.addPath(str(HTML_DIR))
+watcher.addPath(str(r'C:\Users\jalvarez\Local\PMEJ\Codigos\2025\ZeusScrape\features\contact\assets\styles\styles.css'))
+watcher.addPath(str(r'C:\Users\jalvarez\Local\PMEJ\Codigos\2025\ZeusScrape\features\contact\pages\page.html'))
 watcher.fileChanged.connect(load_html)
 
 view.resize(1024, 750)

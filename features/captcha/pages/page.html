@@ -1,117 +1,43 @@
-<h1 class="page-title">Pendiente de H.E.S</h1>
+<h1 class="page-title">CAPTCHA</h1>
 
-<section class="date__container">
-    <label for="dateinput__hes">Fecha de cierre</label>
-    <input type="month" name="trip-start" id="dateinput__hes" class="dateinput">
-</section>
-
-<section class="uploadfile__container">
-    <div for="file__actual" class="drop-container" id="dropcontainer__actual">
-        <h2 class="drop-container--title">Archivo actual</h2>
-        <span class="drop-container--title">Deja el archivo aquí</span>
-        o
-        <input required type="file" id="file__actual"
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+<div class="captcha-main-container">
+    <!-- Panel izquierdo para la imagen -->
+    <div class="captcha-image-panel">
+        <h2>CAPTCHA</h2>
+        <div class="captcha-image-container">
+            <img id="captcha-display-image" class="captcha-image" src="" alt="Captcha">
+            <div class="captcha-image-placeholder">
+                <i class="fas fa-image" style="font-size: 48px; margin-bottom: 10px;"></i>
+                <p>La imagen del CAPTCHA aparecerá aquí</p>
+            </div>
+        </div>
     </div>
 
-    <div for="file__previo" class="drop-container" id="dropcontainer__previo">
-        <h2 class="drop-container--title">Archivo previo</h2>
-        <span class="drop-container--title">Deja el archivo aquí</span>
-        o
-        <input required type="file" id="file__previo"
-            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
-    </div>
-</section>
-
-<fieldset class="checklist__hes">
-    <legend>Enviar Correos a Áreas</legend>
-
-    <div class="row row-1">
-        <div>
-            <input type="checkbox" class="field__checkbox--hes" id="checkbox-sustentabilidad" name="areas"
-                value="Área Sustentabilidad" />
-            <label for="checkbox-sustentabilidad">
-                <span></span>
-                Sustentabilidad
-                <ins><i></i></ins>
+    <!-- Panel derecho para controles -->
+    <div class="captcha-control-panel">
+        <div class="captcha-input-section">
+            <label for="captcha-number-input" class="captcha-input-label">
+                Ingrese el código CAPTCHA:
             </label>
+            <input 
+                type="number"
+                id="captcha-number-input" 
+                class="captcha-number-input"
+                placeholder="0000"
+                maxlength="4"
+                oninput="limitarNumerosCaptcha(this)"
+                onkeydown="return soloNumerosCaptcha(event)"
+                min="0"
+                max="9999"
+                pattern="\d*"
+            >
+            <button class="captcha-verify-button" onclick="verificarCaptcha()">
+                Verificar CAPTCHA
+            </button>
         </div>
 
-        <div>
-            <input type="checkbox" class="field__checkbox--hes" id="checkbox-informatica" name="areas"
-                value="Área Informática" />
-            <label for="checkbox-informatica">
-                <span></span>
-                Informática
-                <ins><i></i></ins>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="field__checkbox--hes" id="checkbox-finanzas" name="areas"
-                value="Área Adm & Finanzas" />
-            <label for="checkbox-finanzas">
-                <span></span>
-                Finanzas
-                <ins><i></i></ins>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="field__checkbox--hes" id="checkbox-operaciones" name="areas"
-                value="Área Operaciones" />
-            <label for="checkbox-operaciones">
-                <span></span>
-                Operaciones
-                <ins><i></i></ins>
-            </label><br>
+        <div id="captcha-message-display" class="captcha-message-container">
+            Los mensajes aparecerán aquí
         </div>
     </div>
-
-    <div class="row row-2">
-        <div>
-            <input type="checkbox" class="field__checkbox--hes" id="checkbox-personas" name="areas"
-                value="Área Personas" />
-            <label for="checkbox-personas">
-                <span></span>
-                Personas
-                <ins><i></i></ins>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="field__checkbox--hes" id="checkbox-sso" name="areas"
-                value="Área SSO" />
-            <label for="checkbox-sso">
-                <span></span>
-                SSO
-                <ins><i></i></ins>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="field__checkbox--hes" id="checkbox-comercial" name="areas"
-                value="Área Comercial" />
-            <label for="checkbox-comercial">
-                <span></span>
-                Comercial
-                <ins><i></i></ins>
-            </label>
-        </div>
-    </div>
-</fieldset>
-
-<section class="button-hes-container">
-    <div id="create_hes_file_container" class="button-container">
-        <button class="button_hes" id="create_hes_file">Generar Archivo Hes</button>
-        <div class="button-overlay"></div>
-    </div>
-    <div id="split_file_container" class="button-container">
-        <button class="button_hes" id="split_file">Generar Archivo por Área</button>
-        <div class="button-overlay"></div>
-    </div>
-    <div id="send_email_container" class="button-container">
-        <button class="button_hes" id="send_email">Generar Correos por Área</button>
-        <div class="button-overlay"></div>
-    </div>
-</section>
+</div>

@@ -1,0 +1,49 @@
+<h1 class="page-title">Scrape Zeus</h1>
+
+<div class="zeus-container">
+    <!-- Controles superiores: Archivo y Hoja -->
+    <div class="zeus-top-controls">
+        <input type="file" id="zeus-excel-file" class="zeus-input" accept=".xlsx,.xls">
+        <select id="zeus-sheet-select" class="zeus-select">
+            <option value="">Seleccionar Hoja</option>
+        </select>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="zeus-main-content">
+        <!-- Panel izquierdo: Identificadores y botón -->
+        <div class="zeus-left-panel">
+            <div class="zeus-cell-inputs">
+                <div class="zeus-input-label">
+                    <label for="zeus-cell-name">Celda Nombre:</label>
+                    <input type="text" id="zeus-cell-name" class="zeus-input" placeholder="Ej: A1">
+                </div>
+                <div class="zeus-input-label">
+                    <label for="zeus-cell-rut">Celda RUT:</label>
+                    <input type="text" id="zeus-cell-rut" class="zeus-input" placeholder="Ej: B1">
+                </div>
+                <div class="zeus-input-label">
+                    <label for="zeus-cell-last">Última Celda:</label>
+                    <input type="text" id="zeus-cell-last" class="zeus-input" placeholder="Ej: C10">
+                </div>
+            </div>
+            <div class="zeus-cell-button">
+                <button id="zeus-select-cells" class="zeus-button">Seleccionar</button>
+            </div>
+        </div>
+
+        <!-- Panel derecho: Previsualización de Excel -->
+        <div class="zeus-excel-preview" id="zeus-excel-preview">
+            <table class="zeus-table">
+                <!-- El contenido de la tabla se generará dinámicamente -->
+            </table>
+        </div>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="zeus-progress-container">
+        <div class="zeus-progress">
+            <div id="zeus-progress-bar" class="zeus-progress-bar"></div>
+        </div>
+    </div>
+</div>

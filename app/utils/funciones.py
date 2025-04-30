@@ -243,9 +243,8 @@ def rename_temp_file(temp, real):
         os.remove(temp)
         return f'Error al guardar el archivo: {e}'
 
-def clean_folder(folder):
-    files = glob.glob(folder+"/*")
-    for file in files:
+def clean_folder(folder:Path, extension:str):
+    for file in folder.glob(extension):
         try:
             os.remove(file)
             print(f'{file} eliminado')
