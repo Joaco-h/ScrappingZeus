@@ -1,3 +1,0 @@
-code to deploy tensorboard from terminal (env must be active):
-
-python -m tensorboard.main --logdir= "C:\Users\jalvarez\Local\PMEJ\Codigos\2024\Cuentas por Pagar Aut SAP\ml\models\02_captcha_to_text\202407231124\logs"
