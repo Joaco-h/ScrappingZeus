@@ -11,7 +11,7 @@ function initializerPages() {
     
     document.getElementById('pyme__page').addEventListener('click', function() {
         loadDynamicContent('./features/pyme_finder/pages/page.html', 
-            [initializerCreatePymeFile, initializerTablePyme]);
+            [initializerCreatePymeFile]);
     });
     
 }

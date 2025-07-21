@@ -24,22 +24,7 @@
     margin: 5px 0px;
 }
 
-.selectorPyme {
-    margin-right: 20px;
-    border: none;
-    background: #f7ba31;
-    padding: 5px 10px;
-    border-radius: 10px;
-    color: #fff;
-    cursor: pointer;
-    transition: background .2s ease-in-out;
-}
-
-.selectorPyme:hover {
-    background-color: #b38823;
-}
-
-.button_search_pyme {
+.button_captcha {
     margin: 5px 0px 10px 0px ;
     border: none;
     background: #f7ba31;
@@ -50,29 +35,6 @@
     transition: background .2s ease-in-out;
 }
 
-.button_search_pyme:hover {
+.button_captcha:hover {
     background-color: #b38823;
 }
-/* 
-.fileSelector--container {
-    display: flex;
-    align-items: center;
-    margin-top: 30px;
-}
-
-.fileSelector {
-    border-color: 1px solid white;
-    width: 132px;
-    margin-left: 10px;
-}
-
-.main-content {
-    display: grid;
-    place-items: center;
-    background-color: black;
-    margin-top: 170px;
-}
-
-table {
-    margin: 10px 10px;
-} */

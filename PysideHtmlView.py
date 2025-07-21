@@ -43,17 +43,32 @@ class CallHandler(QObject):
         
         self.uploaded_files[idfile] = file_stream
         print(self.uploaded_files)
-        
+    
     @Slot(str, list, result=str)
     def send_order_to_server(self, command, values):
         print(f"send_order_to_server llamado con commando: {command}")
-        if command == "Crea el archivo Pyme":
+        
+        if command == "Predice el Captcha":
             print('Ejecutando SearchPyme...')
-            self.search_pyme = SearchPyme(self.uploaded_files, values)
+            self.search_pyme = SearchPyme()
             self.search_pyme.finished.connect(self.on_processing_finished)
             self.search_pyme.start()
-            return "Se genero el archivo Pyme"
+            return "Se predijo el Captcha"
         return "Comando no reconocido"
+    
+    @Slot(str)
+    def on_processing_finished(self, result):
+        print("Resultado del hilo recibido")
+        self.last_captcha_base64 = result[0]
+        self.last_captcha_prediction = result[1]
+
+    @Slot(result=str)
+    def get_image_base64(self):
+        return self.last_captcha_base64
+
+    @Slot(result=str)
+    def get_captcha_prediction(self):
+        return self.last_captcha_prediction
 
 
 #Configuracion de la aplicacion

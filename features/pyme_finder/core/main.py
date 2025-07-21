@@ -2,6 +2,11 @@ from common.utils.funciones import np, typing, handler_excel_errors
 from features.pyme_finder.utils.funciones import (cv2, BaseModelConfigs, OnnxInferenceModel, ctc_decoder, get_captcha_image)
 from features.pyme_finder.configs.config_scrapping import site_url, call_driver
 from features.pyme_finder.configs.config_ml import ml_path, configs_path
+import cv2
+import base64
+import io
+from PIL import Image
+import numpy as np
 
 class SalirBucle(Exception):
     pass
@@ -35,19 +40,26 @@ def scrape_rut_info():
         captcha = model.predict(image)
         
         image = cv2.resize(image, (image.shape[1] * 4, image.shape[0] * 4))
-        cv2.imshow(captcha, image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        driver_chrome.get(site_url)
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        pil_img = Image.fromarray(image_rgb)
+
+        buffered = io.BytesIO()
+        pil_img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
         
-        i+=1
+        # image = cv2.resize(image, (image.shape[1] * 4, image.shape[0] * 4))
+        # cv2.imshow(captcha, image)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        # driver_chrome.get(site_url)
+        
+        return [img_str, captcha]
 
 @handler_excel_errors
 def create_pyme_file():
     try:
-        scrape_rut_info()
-        return 'Archivo Pyme Creado Exitosamente!'
-    
+        results = scrape_rut_info()
+        return results
     except PermissionError as e:
         return f'Error de Permisos: {e}'
     except FileNotFoundError as e:

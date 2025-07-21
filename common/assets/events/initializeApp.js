@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function () {
         initializerSendButtonStates();
         initializerCreateButtonStates();
         initializerCreatePymeFile();
-        initializerTablePyme();
     });
 });
 
