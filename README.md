@@ -48,7 +48,7 @@ El portal utiliza CAPTCHAs que consisten en 4 dígitos numéricos, presentados c
 
 
 ### Clona este repositorio
-git clone https://github.com/TU_USUARIO/zeus-scraper-captcha-solver.git
+git clone (https://github.com/Joaco-h/ScrappingZeus.git)
 ### Entra en el proyecto
 cd zeus-scraper-captcha-solver
 ### Instala las dependencias
